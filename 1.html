@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Express CRUD API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        h2 {
+            color: #555;
+        }
+        .container {
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+    <script>
+        async function fetchData() {
+            const response = await fetch('/api/data');
+            const data = await response.json();
+            const dataContainer = document.getElementById('data');
+            dataContainer.innerHTML = '';
+
+            if (data.length === 0) {
+                dataContainer.innerHTML = 'No data available.';
+            } else {
+                data.forEach(user => {
+                    dataContainer.innerHTML += `ID: ${user._id} <br>Name: ${user.name} <br>Email: ${user.email} <br>Age: ${user.age} <br><br>`;
+                });
+            }
+        }
+
+        async function addData() {
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const age = document.getElementById('age').value;
+
+            await fetch('/api/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, age })
+            });
+            fetchData();
+        }
+
+        async function deleteData() {
+            const id = document.getElementById('deleteId').value;
+            await fetch(`/api/data/${id}`, { method: 'DELETE' });
+            fetchData();
+        }
+
+        async function editData() {
+            const id = document.getElementById('editId').value;
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const age = document.getElementById('editAge').value;
+
+            await fetch(`/api/data/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, age })
+            });
+            fetchData();
+        }
+    </script>
+</head>
+<body>
+    <h1>Test Express CRUD API</h1>
+
+    <div class="container">
+        <h2>Add Data</h2>
+        <input id="name" type="text" placeholder="Name">
+        <input id="email" type="text" placeholder="Email">
+        <input id="age" type="text" placeholder="Age">
+        <button onclick="addData()">Add Data</button>
+    </div>
+
+    <div class="container">
+        <h2>Delete Data</h2>
+        <input id="deleteId" type="text" placeholder="ID to delete">
+        <button onclick="deleteData()">Delete Data</button>
+    </div>
+
+    <div class="container">
+        <h2>Edit Data</h2>
+        <input id="editId" type="text" placeholder="ID to edit">
+        <input id="editName" type="text" placeholder="New Name">
+        <input id="editEmail" type="text" placeholder="New Email">
+        <input id="editAge" type="text" placeholder="New Age">
+        <button onclick="editData()">Edit Data</button>
+    </div>
+
+    <div class="container">
+        <h2>Users</h2>
+        <pre id="data">No data fetched yet.</pre>
+        <button onclick="fetchData()">Fetch Data</button>
+    </div>
+</body>
+</html>
